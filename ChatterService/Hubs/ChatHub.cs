@@ -14,6 +14,18 @@ namespace ChatterService.Hubs
             this.connections = connections;
         }
 
+        
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            if (this.connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection)) // TODO: fix "?"
+            {
+                if (userConnection.User == null) return; // TODO is this good?
+
+                connections.Remove(Context.ConnectionId);
+                await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", botUser, $"{userConnection.User} has left"); // TODO extract to constant
+            }
+        }
+
         public async Task SendMessage(string message)
         {
             if (this.connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection)) // TODO: fix "?"
