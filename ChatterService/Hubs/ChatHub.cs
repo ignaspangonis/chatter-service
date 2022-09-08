@@ -13,7 +13,6 @@ namespace ChatterService.Hubs
             botUser = "ChatBot";
             this.connections = connections;
         }
-
         
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
