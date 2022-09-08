@@ -7,4 +7,3 @@ namespace ChatterService
         public string? Room { get; set; }
     }
 }
-
