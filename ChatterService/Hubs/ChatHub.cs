@@ -5,15 +5,17 @@ namespace ChatterService.Hubs
 {
     public class ChatHub : Hub
     {
-        private readonly string botUser;
         private readonly IDictionary<string, UserConnection> connections;
+        private readonly string BotUserName = "ChatBot";
 
         public ChatHub(IDictionary<string, UserConnection> connections)
         {
-            botUser = "ChatBot";
             this.connections = connections;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             UserConnection? userConnection = GetUserConnection();
@@ -21,27 +23,37 @@ namespace ChatterService.Hubs
             if (userConnection == null) return;
             
             connections.Remove(Context.ConnectionId);
-            await SendReceivedMessage(userConnection.Room, botUser, $"{userConnection.User} has left");
+            await SendReceivedMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has left");
         }
 
+        /// <summary>
+        /// When this method is invoked on the frontend, it sends the message back to the frontend
+        /// </summary>
+        /// <param name="message">Message to send back to frontend</param>
         public async Task SendMessage(string message)
         {
             UserConnection? userConnection = GetUserConnection();
 
             if (userConnection == null) return;
 
-            await SendReceivedMessage(userConnection.Room, userConnection.User, message);
+            await SendReceivedMessage(userConnection.RoomName, userConnection.UserName, message);
         }
 
+        /// <summary>
+        /// Joins room when this method is invoked on the frontend
+        /// </summary>
         public async Task JoinRoom(UserConnection userConnection)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
+            await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.RoomName);
 
             this.connections[Context.ConnectionId] = userConnection;
 
-            await SendReceivedMessage(userConnection.Room, botUser, $"{userConnection.User} has joined {userConnection.Room}");
+            await SendReceivedMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has joined {userConnection.RoomName}");
         }
 
+        /// <summary>
+        /// Sends message to the frontend via ReceiveMessage method
+        /// </summary>
         private async Task SendReceivedMessage(string? groupName, string? userName, string message)
         {
             if (groupName == null || userName == null) return;
@@ -49,8 +61,14 @@ namespace ChatterService.Hubs
             await Clients.Group(groupName).SendAsync("ReceiveMessage", userName, message);
         }
 
+        /// <summary>
+        /// Gets the user connection from connections array
+        /// </summary>
         private UserConnection? GetUserConnection()
         {
+            // Each client connecting to a hub passes a unique connection id,
+            // which can be retrieved via ConnectionId of the hub context.
+            // https://learn.microsoft.com/en-us/aspnet/signalr/overview/guide-to-the-api/mapping-users-to-connections
             this.connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection);
 
             return userConnection;
