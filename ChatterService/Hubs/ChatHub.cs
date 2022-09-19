@@ -13,24 +13,24 @@ namespace ChatterService.Hubs
             botUser = "ChatBot";
             this.connections = connections;
         }
-        
+
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            if (this.connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection)) // TODO: fix "?"
-            {
-                if (userConnection.User == null) return; // TODO is this good?
+            UserConnection? userConnection = GetUserConnection();
 
-                connections.Remove(Context.ConnectionId);
-                await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", botUser, $"{userConnection.User} has left"); // TODO extract to constant
-            }
+            if (userConnection == null) return;
+            
+            connections.Remove(Context.ConnectionId);
+            await SendReceivedMessage(userConnection.Room, botUser, $"{userConnection.User} has left");
         }
 
         public async Task SendMessage(string message)
         {
-            if (this.connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection)) // TODO: fix "?"
-            {
-                await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", userConnection.User, message);
-            }
+            UserConnection? userConnection = GetUserConnection();
+
+            if (userConnection == null) return;
+
+            await SendReceivedMessage(userConnection.Room, userConnection.User, message);
         }
 
         public async Task JoinRoom(UserConnection userConnection)
@@ -39,7 +39,21 @@ namespace ChatterService.Hubs
 
             this.connections[Context.ConnectionId] = userConnection;
 
-            await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", botUser, $"{userConnection.User} has joined {userConnection.Room}");
+            await SendReceivedMessage(userConnection.Room, botUser, $"{userConnection.User} has joined {userConnection.Room}");
+        }
+
+        private async Task SendReceivedMessage(string? groupName, string? userName, string message)
+        {
+            if (groupName == null || userName == null) return;
+
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", userName, message);
+        }
+
+        private UserConnection? GetUserConnection()
+        {
+            this.connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection);
+
+            return userConnection;
         }
     }
 }
