@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatterService.Hubs
@@ -20,10 +20,11 @@ namespace ChatterService.Hubs
         {
             UserConnection? userConnection = GetUserConnection();
 
-            if (userConnection == null) return;
+            if (userConnection?.RoomName == null) return;
             
             connections.Remove(Context.ConnectionId);
             await SendReceivedMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has left");
+            await SendConnectedUsers(userConnection.RoomName);
         }
 
         /// <summary>
@@ -44,21 +45,36 @@ namespace ChatterService.Hubs
         /// </summary>
         public async Task JoinRoom(UserConnection userConnection)
         {
+            if (userConnection.RoomName == null) return;
+
             await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.RoomName);
 
-            this.connections[Context.ConnectionId] = userConnection;
+            connections[Context.ConnectionId] = userConnection;
 
             await SendReceivedMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has joined {userConnection.RoomName}");
+            await SendConnectedUsers(userConnection.RoomName);
         }
 
         /// <summary>
-        /// Sends message to the frontend via ReceiveMessage method
+        /// Sends conencted users to all clients in the provided roomName via UsersInRoom method
         /// </summary>
-        private async Task SendReceivedMessage(string? groupName, string? userName, string message)
+        public Task SendConnectedUsers(string roomName)
         {
-            if (groupName == null || userName == null) return;
+            var users = connections.Values
+                .Where(connection => connection.RoomName == roomName)
+                .Select(connection => connection.UserName);
 
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", userName, message);
+            return Clients.Group(roomName).SendAsync("UsersInRoom", users);
+        }
+
+        /// <summary>
+        /// Sends message to all clients in the provided group via ReceiveMessage method
+        /// </summary>
+        private async Task SendReceivedMessage(string? roomName, string? userName, string message)
+        {
+            if (roomName == null || userName == null) return;
+
+            await Clients.Group(roomName).SendAsync("ReceiveMessage", userName, message);
         }
 
         /// <summary>
