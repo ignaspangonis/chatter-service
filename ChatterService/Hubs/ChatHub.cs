@@ -14,7 +14,7 @@ namespace ChatterService.Hubs
         }
 
         /// <summary>
-        /// 
+        /// Invoked automatically when connection is closed
         /// </summary>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
@@ -28,7 +28,7 @@ namespace ChatterService.Hubs
         }
 
         /// <summary>
-        /// When this method is invoked on the frontend, it sends the message back to the frontend
+        /// When invoked on the frontend, it sends the message back to the frontend
         /// </summary>
         /// <param name="message">Message to send back to frontend</param>
         public async Task SendMessage(string message)
@@ -41,7 +41,7 @@ namespace ChatterService.Hubs
         }
 
         /// <summary>
-        /// Joins room when this method is invoked on the frontend
+        /// Joins room when invoked on the frontend
         /// </summary>
         public async Task JoinRoom(UserConnection userConnection)
         {
