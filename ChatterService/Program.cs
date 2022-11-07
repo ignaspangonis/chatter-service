@@ -5,6 +5,11 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins, option =>
@@ -15,15 +20,24 @@ builder.Services.AddCors(options =>
         .AllowCredentials();
     });
 });
-builder.Services.AddSignalR();
-builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
 
 var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
 
 app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.MapGet("/", () => "Hello World!");
 app.MapHub<ChatHub>("/chat");
+app.MapControllers();
 
 app.Run();
