@@ -1,11 +1,12 @@
 ﻿using ChatterService;
 using ChatterService.Hubs;
+using ChatterService.Services;
+using ChatterService.Entities;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
@@ -20,6 +21,9 @@ builder.Services.AddCors(options =>
         .AllowCredentials();
     });
 });
+builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
+builder.Services.AddSingleton<MessageService>();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 

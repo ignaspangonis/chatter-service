@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using ChatterService.Entities;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatterService.Hubs
@@ -75,6 +76,16 @@ namespace ChatterService.Hubs
             if (roomName == null || userName == null) return;
 
             await Clients.Group(roomName).SendAsync("ReceiveMessage", userName, message);
+        }
+
+        /// <summary>
+        /// Sends message to all clients in the provided group via ReceiveMessage method
+        /// </summary>
+        private async Task SendReceivedMessages(string? roomName, IEnumerable<IMessage> messages)
+        {
+            if (roomName == null) return;
+
+            await Clients.Group(roomName).SendAsync("ReceiveMessages", messages);
         }
 
         /// <summary>
