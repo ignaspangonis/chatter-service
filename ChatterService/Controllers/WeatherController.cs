@@ -9,7 +9,7 @@ namespace ChatterService.Controllers;
 public class WeatherController : ControllerBase
 {
     private readonly ILogger<WeatherController> _logger;
-    private readonly WeatherProvider weatherProvider;
+    private readonly IWeatherProvider weatherProvider;
 
     public WeatherController(ILogger<WeatherController> logger)
     {
@@ -21,7 +21,7 @@ public class WeatherController : ControllerBase
     [ResponseCache(VaryByHeader = "User-Agent", Duration = 30)]
     public WeatherDto Get()
     {
-        _logger.Log(LogLevel.Information, "GET /weather-new called");
+        _logger.Log(LogLevel.Information, "GET /weather called");
         return weatherProvider.GetWeather();
     }
 }
