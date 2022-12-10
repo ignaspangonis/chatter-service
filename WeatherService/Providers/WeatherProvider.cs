@@ -7,7 +7,12 @@ using System.Text.Json;
 
 namespace WeatherService.Providers
 {
-    public class WeatherProvider
+	public interface IWeatherProvider
+	{
+		public WeatherDto GetWeather();
+    }
+
+    public class WeatherProvider: IWeatherProvider
 	{
         private readonly RestClient m_client;
 		private readonly WeatherTransformers transformers;
