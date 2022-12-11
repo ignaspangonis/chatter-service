@@ -5,6 +5,7 @@ using MongoDB.Bson;
 
 using ChatterService.Entities;
 using Microsoft.VisualBasic;
+using System.Collections.Generic;
 
 namespace ChatterService.Services
 {
@@ -15,8 +16,8 @@ namespace ChatterService.Services
         public MessageService(IOptions<MongoDBSettings> mongoDBSettings)
         {
 
-            MongoClient client = new MongoClient(mongoDBSettings.Value.ConnectionURI);
-            IMongoDatabase database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
+            var client = new MongoClient(mongoDBSettings.Value.ConnectionURI);
+            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
 
             _messagesCollection = database.GetCollection<IMessage>(mongoDBSettings.Value.CollectionName);
         }
@@ -29,18 +30,22 @@ namespace ChatterService.Services
         }
 
 
-        public async Task<List<IMessage>> GetAsync()
+        public async Task<IEnumerable<IMessage>> GetAsync(string? roomName)
         {
-            return await _messagesCollection.Find(new BsonDocument()).ToListAsync();
+            if (roomName == null) return new List<IMessage>();
+
+            var filter = Builders<IMessage>.Filter.Eq("room_name", roomName);
+
+            return await _messagesCollection.Find(filter).ToListAsync();
         }
 
         public async Task DeleteAsync(string id)
         {
-            FilterDefinition<IMessage> filter = Builders<IMessage>.Filter.Eq("id", id);
+            var filter = Builders<IMessage>.Filter.Eq("id", id);
+
             await _messagesCollection.DeleteOneAsync(filter);
 
             return;
-
         }
     }
 }

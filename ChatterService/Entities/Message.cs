@@ -4,44 +4,54 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ChatterService.Entities
 {
-	public interface IMessage
+    public interface IMessage
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
-        public string Id { get; set; }
+        public ObjectId Id { get; set; }
 
         [BsonElement("author")]
-        public double Author { get; set; }
+        public string Author { get; set; }
 
         [BsonElement("content")]
         public string Content { get; set; }
 
-        [BsonElement("timestamp")]
-        public BsonTimestamp TimeStamp { get; set; }
+        [BsonElement("created_at")]
+        public DateTime CreatedAt { get; set; }
 
         [BsonElement("room_name")]
         public string RoomName { get; set; }
     }
 
-    public class Message
+    [BsonDiscriminator("Message")]
+    public class Message : IMessage
     {
+        public Message(string? author, string content, string? roomName)
+        {
+            Author = author ?? "";
+            Content = content;
+            RoomName = roomName ?? "";
+            CreatedAt = DateTime.Now;
+            Id = ObjectId.GenerateNewId();
+        }
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("id")]
-        public string? Id { get; set; }
+        public ObjectId Id { get; set; }
 
         [BsonElement("author")]
-        public double Author { get; set; }
+        public string Author { get; set; }
 
         [BsonElement("content")]
-        public string? Content { get; set; }
+        public string Content { get; set; }
 
-        [BsonElement("timestamp")]
-        public BsonTimestamp? TimeStamp { get; set; }
+        [BsonElement("created_at")]
+        public DateTime CreatedAt { get; set; }
 
         [BsonElement("room_name")]
-        public string? RoomName { get; set; }
+        public string RoomName { get; set; }
     }
 }
 

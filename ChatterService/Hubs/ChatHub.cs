@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using ChatterService.Entities;
+﻿using ChatterService.Entities;
+using ChatterService.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatterService.Hubs
@@ -7,11 +7,13 @@ namespace ChatterService.Hubs
     public class ChatHub : Hub
     {
         private readonly IDictionary<string, UserConnection> connections;
+        private readonly MessageService messageService;
         private readonly string BotUserName = "ChatBot";
 
-        public ChatHub(IDictionary<string, UserConnection> connections)
+        public ChatHub(IDictionary<string, UserConnection> connections, MessageService messageService)
         {
             this.connections = connections;
+            this.messageService = messageService;
         }
 
         /// <summary>
@@ -22,9 +24,10 @@ namespace ChatterService.Hubs
             UserConnection? userConnection = GetUserConnection();
 
             if (userConnection?.RoomName == null) return;
-            
+
             connections.Remove(Context.ConnectionId);
-            await SendReceivedMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has left");
+
+            await SaveAndBroadcastMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has left");
             await SendConnectedUsers(userConnection.RoomName);
         }
 
@@ -38,7 +41,7 @@ namespace ChatterService.Hubs
 
             if (userConnection == null) return;
 
-            await SendReceivedMessage(userConnection.RoomName, userConnection.UserName, message);
+            await SaveAndBroadcastMessage(userConnection.RoomName, userConnection.UserName, message);
         }
 
         /// <summary>
@@ -52,8 +55,11 @@ namespace ChatterService.Hubs
 
             connections[Context.ConnectionId] = userConnection;
 
-            await SendReceivedMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has joined {userConnection.RoomName}");
+            var messageHistory = await messageService.GetAsync(userConnection.RoomName);
+
+            await BroadcastMessageHistory(userConnection.RoomName, messageHistory);
             await SendConnectedUsers(userConnection.RoomName);
+            await SaveAndBroadcastMessage(userConnection.RoomName, BotUserName, $"{userConnection.UserName} has joined {userConnection.RoomName}");
         }
 
         /// <summary>
@@ -69,23 +75,26 @@ namespace ChatterService.Hubs
         }
 
         /// <summary>
-        /// Sends message to all clients in the provided group via ReceiveMessage method
+        /// Saves a message to DB and sends it to all clients in the provided group via ReceiveMessage method
         /// </summary>
-        private async Task SendReceivedMessage(string? roomName, string? userName, string message)
+        private async Task SaveAndBroadcastMessage(string? roomName, string? userName, string message)
         {
-            if (roomName == null || userName == null) return;
+            UserConnection? userConnection = GetUserConnection();
 
+            if (roomName == null || userName == null || userConnection == null) return;
+
+            await messageService.CreateAsync(new Message(userName, message, userConnection.RoomName));
             await Clients.Group(roomName).SendAsync("ReceiveMessage", userName, message);
         }
 
         /// <summary>
         /// Sends message to all clients in the provided group via ReceiveMessage method
         /// </summary>
-        private async Task SendReceivedMessages(string? roomName, IEnumerable<IMessage> messages)
+        private async Task BroadcastMessageHistory(string? roomName, IEnumerable<IMessage> messages)
         {
             if (roomName == null) return;
 
-            await Clients.Group(roomName).SendAsync("ReceiveMessages", messages);
+            await Clients.Group(roomName).SendAsync("ReceiveMessageHistory", messages);
         }
 
         /// <summary>
