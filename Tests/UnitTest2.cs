@@ -27,11 +27,9 @@ public class Tests2
     [Test]
     public void Test1()
     {
-
-        // init repositor
         var weatherDto = new WeatherDto(1.0, "2022-01-01T01:00", "cold");
         var weatherResponse = new WeatherResponse(new CurrentWeatherResponse(1.0, "2022-01-01T01:00"));
-        WeatherTransformers weatherTransformers = new WeatherTransformers();
+        var weatherTransformers = new WeatherTransformers();
 
         Assert.That(weatherDto, Is.EqualTo(weatherTransformers.TransformWeather(weatherResponse)));
     }
