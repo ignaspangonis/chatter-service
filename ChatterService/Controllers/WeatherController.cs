@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WeatherService.Providers;
 using WeatherService.Entities;
+using ChatterService.Services;
+using Microsoft.Extensions.Logging;
 
 namespace ChatterService.Controllers;
 
@@ -8,12 +10,12 @@ namespace ChatterService.Controllers;
 [Route("weather")]
 public class WeatherController : ControllerBase
 {
-    private readonly ILogger<WeatherController> _logger;
+    private readonly ILogger<WeatherController> logger;
     private readonly IWeatherProvider weatherProvider;
 
     public WeatherController(ILogger<WeatherController> logger)
     {
-        _logger = logger;
+        this.logger = logger;
         weatherProvider = new WeatherProvider();
     }
 
@@ -21,8 +23,16 @@ public class WeatherController : ControllerBase
     [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
     public async Task<WeatherDto> Get()
     {
-        _logger.Log(LogLevel.Information, "GET /weather called");
-        return await weatherProvider.GetWeather();
+        logger.Log(LogLevel.Information, "GET /weather called");
+
+        try
+        {
+            return await weatherProvider.GetWeather();
+        }
+        catch (Exception exception)
+        {
+            logger.Log(LogLevel.Error, "Error", exception);
+        }
     }
 }
 
