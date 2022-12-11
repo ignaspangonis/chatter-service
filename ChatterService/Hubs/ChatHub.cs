@@ -39,7 +39,7 @@ namespace ChatterService.Hubs
         }
 
         /// <summary>
-        /// When invoked on the frontend, it sends the message back to the frontend
+        /// When invoked on the frontend, it saves the message and broacasts it
         /// </summary>
         /// <param name="message">Message to send back to frontend</param>
         public async Task SendMessage(string message)
