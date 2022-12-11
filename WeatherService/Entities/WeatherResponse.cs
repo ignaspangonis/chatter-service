@@ -1,5 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace WeatherService.Entities
 {
@@ -41,10 +40,10 @@ namespace WeatherService.Entities
         public double Elevation { get; set; }
 
         [JsonProperty("current_weather")]
-        public ICurrentWeatherResponse CurrentWeather { get; set; }
+        public CurrentWeatherResponse CurrentWeather { get; set; }
     }
 
-    public class WeatherResponse
+    public class WeatherResponse : IWeatherResponse
     {
         public double Latitude { get; set; }
 

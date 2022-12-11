@@ -8,12 +8,15 @@ namespace ChatterService.Hubs
     {
         private readonly IDictionary<string, UserConnection> connections;
         private readonly MessageService messageService;
+        private readonly ILogger<ChatHub> logger;
+
         private readonly string BotUserName = "ChatBot";
 
-        public ChatHub(IDictionary<string, UserConnection> connections, MessageService messageService)
+        public ChatHub(IDictionary<string, UserConnection> connections, MessageService messageService, ILogger<ChatHub> logger)
         {
             this.connections = connections;
             this.messageService = messageService;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -23,7 +26,11 @@ namespace ChatterService.Hubs
         {
             UserConnection? userConnection = GetUserConnection();
 
-            if (userConnection?.RoomName == null) return;
+            if (userConnection?.RoomName == null)
+            {
+                logger.Log(LogLevel.Error, "No room name in ChatHub.OnDisconnectedAsync method");
+                return;
+            }
 
             connections.Remove(Context.ConnectionId);
 
@@ -39,7 +46,11 @@ namespace ChatterService.Hubs
         {
             UserConnection? userConnection = GetUserConnection();
 
-            if (userConnection == null) return;
+            if (userConnection == null)
+            {
+                logger.Log(LogLevel.Error, "No userConnection in ChatHub.SendMessage method");
+                return;
+            }
 
             await SaveAndBroadcastMessage(userConnection.RoomName, userConnection.UserName, message);
         }
@@ -49,13 +60,17 @@ namespace ChatterService.Hubs
         /// </summary>
         public async Task JoinRoom(UserConnection userConnection)
         {
-            if (userConnection.RoomName == null) return;
+            if (userConnection.RoomName == null)
+            {
+                logger.Log(LogLevel.Error, "No userConnection in ChatHub.JoinRoom method");
+                return;
+            }
 
             await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.RoomName);
 
             connections[Context.ConnectionId] = userConnection;
 
-            var messageHistory = await messageService.GetAsync(userConnection.RoomName);
+            var messageHistory = await messageService.GetRoomAsync(userConnection.RoomName);
 
             await BroadcastMessageHistory(userConnection.RoomName, messageHistory);
             await SendConnectedUsers(userConnection.RoomName);
@@ -65,7 +80,7 @@ namespace ChatterService.Hubs
         /// <summary>
         /// Sends conencted users to all clients in the provided roomName via UsersInRoom method
         /// </summary>
-        public Task SendConnectedUsers(string roomName)
+        private Task SendConnectedUsers(string roomName)
         {
             var users = connections.Values
                 .Where(connection => connection.RoomName == roomName)
@@ -79,11 +94,13 @@ namespace ChatterService.Hubs
         /// </summary>
         private async Task SaveAndBroadcastMessage(string? roomName, string? userName, string message)
         {
-            UserConnection? userConnection = GetUserConnection();
+            if (roomName == null || userName == null)
+            {
+                logger.Log(LogLevel.Error, "Error in ChatHub.SaveAndBroadcastMessage", new { roomName, userName });
+                return;
+            }
 
-            if (roomName == null || userName == null || userConnection == null) return;
-
-            await messageService.CreateAsync(new Message(userName, message, userConnection.RoomName));
+            await messageService.CreateMessageAsync(new Message(userName, message, roomName));
             await Clients.Group(roomName).SendAsync("ReceiveMessage", userName, message);
         }
 
@@ -92,7 +109,11 @@ namespace ChatterService.Hubs
         /// </summary>
         private async Task BroadcastMessageHistory(string? roomName, IEnumerable<IMessage> messages)
         {
-            if (roomName == null) return;
+            if (roomName == null)
+            {
+                logger.Log(LogLevel.Error, "No userConnection in ChatHub.BroadcastMessageHistory method");
+                return;
+            }
 
             await Clients.Group(roomName).SendAsync("ReceiveMessageHistory", messages);
         }
