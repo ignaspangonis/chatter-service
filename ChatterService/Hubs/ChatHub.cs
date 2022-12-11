@@ -1,6 +1,7 @@
 ﻿using ChatterService.Entities;
 using ChatterService.Services;
 using Microsoft.AspNetCore.SignalR;
+using WeatherService.Providers;
 
 namespace ChatterService.Hubs
 {
@@ -8,15 +9,17 @@ namespace ChatterService.Hubs
     {
         private readonly IDictionary<string, UserConnection> connections;
         private readonly MessageService messageService;
+        private readonly WeatherProvider weatherProvider;
         private readonly ILogger<ChatHub> logger;
 
         private readonly string BotUserName = "ChatBot";
 
-        public ChatHub(IDictionary<string, UserConnection> connections, MessageService messageService, ILogger<ChatHub> logger)
+        public ChatHub(IDictionary<string, UserConnection> connections, MessageService messageService, ILogger<ChatHub> logger, WeatherProvider weatherProvider)
         {
             this.connections = connections;
             this.messageService = messageService;
             this.logger = logger;
+            this.weatherProvider = weatherProvider;
         }
 
         /// <summary>
@@ -53,6 +56,12 @@ namespace ChatterService.Hubs
             }
 
             await SaveAndBroadcastMessage(userConnection.RoomName, userConnection.UserName, message);
+
+            if (message.Equals("/weather now"))
+            {
+                var weather = await weatherProvider.GetWeather();
+                await SaveAndBroadcastMessage(userConnection.RoomName, BotUserName, $"Current temperature is {weather.Temperature}.");
+            }
         }
 
         /// <summary>

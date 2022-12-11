@@ -3,6 +3,7 @@ using ChatterService.Hubs;
 using ChatterService.Services;
 using ChatterService.Entities;
 using MongoDB.Bson.Serialization;
+using WeatherService.Providers;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -24,6 +25,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
 builder.Services.AddSingleton<MessageService>();
+builder.Services.AddSingleton<WeatherProvider>();
 builder.Services.AddControllers();
 
 BsonClassMap.RegisterClassMap<Message>();

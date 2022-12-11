@@ -25,7 +25,6 @@ namespace ChatterService.Controllers
         public async Task<IActionResult> Delete(string roomName)
         {
             await messageService.DeleteRoomAsync(roomName);
-            //await chatHub.DeleteMessageRoom();
 
             return Ok(new { message = "Room deleted" });
         }

@@ -9,7 +9,7 @@ namespace WeatherService.Providers
 {
 	public interface IWeatherProvider
 	{
-		public WeatherDto GetWeather();
+		public Task<WeatherDto> GetWeather();
     }
 
     public class WeatherProvider: IWeatherProvider
@@ -23,10 +23,10 @@ namespace WeatherService.Providers
             transformers = new WeatherTransformers();
         }
 
-        public WeatherDto GetWeather()
+        public async Task<WeatherDto> GetWeather()
 		{
 			var request = new RestRequest($"/v1/forecast?latitude=54.69&longitude=25.28&current_weather=true", Method.Get);
-			var response = m_client.Execute(request);
+			var response = await m_client.ExecuteAsync(request);
             var deserializedResponse = JsonConvert.DeserializeObject<WeatherResponse>(response.Content ?? "{}");
 			var transformedResponse = transformers.TransformWeather(deserializedResponse);
 

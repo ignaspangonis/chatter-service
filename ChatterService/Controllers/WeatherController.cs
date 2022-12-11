@@ -19,10 +19,10 @@ public class WeatherController : ControllerBase
 
     [HttpGet(Name = "GetWeather")]
     [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-    public WeatherDto Get()
+    public async Task<WeatherDto> Get()
     {
         _logger.Log(LogLevel.Information, "GET /weather called");
-        return weatherProvider.GetWeather();
+        return await weatherProvider.GetWeather();
     }
 }
 
