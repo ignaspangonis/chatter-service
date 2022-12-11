@@ -109,8 +109,10 @@ namespace ChatterService.Hubs
                 return;
             }
 
-            await messageService.CreateMessageAsync(new Message(userName, message, roomName));
-            await Clients.Group(roomName).SendAsync("ReceiveMessage", userName, message);
+            var messageDto = new Message(userName, message, roomName);
+
+            await messageService.CreateMessageAsync(messageDto);
+            await Clients.Group(roomName).SendAsync("ReceiveMessage", messageDto);
         }
 
         /// <summary>

@@ -63,7 +63,7 @@ namespace WeatherClient.Entities
         public double Elevation { get; set; }
 
         [JsonProperty("current_weather")]
-        public CurrentWeatherResponse? CurrentWeather { get; set; }
+        public CurrentWeatherResponse CurrentWeather { get; set; }
     }
 }
 
