@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WeatherService.Providers;
-using WeatherService.Entities;
-using ChatterService.Services;
-using Microsoft.Extensions.Logging;
+using WeatherClient.Providers;
 
 namespace ChatterService.Controllers;
 
@@ -21,17 +18,18 @@ public class WeatherController : ControllerBase
 
     [HttpGet(Name = "GetWeather")]
     [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-    public async Task<WeatherDto> Get()
+    public async Task<IActionResult> Get()
     {
         logger.Log(LogLevel.Information, "GET /weather called");
 
         try
         {
-            return await weatherProvider.GetWeather();
+            return Ok(await weatherProvider.GetWeather());
         }
         catch (Exception exception)
         {
             logger.Log(LogLevel.Error, "Error", exception);
+            return StatusCode(500);
         }
     }
 }

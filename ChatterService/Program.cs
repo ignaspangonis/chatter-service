@@ -3,7 +3,7 @@ using ChatterService.Hubs;
 using ChatterService.Services;
 using ChatterService.Entities;
 using MongoDB.Bson.Serialization;
-using WeatherService.Providers;
+using WeatherClient.Providers;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 

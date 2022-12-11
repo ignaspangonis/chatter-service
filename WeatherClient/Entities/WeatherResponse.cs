@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace WeatherService.Entities
+namespace WeatherClient.Entities
 {
     public interface ICurrentWeatherResponse
     {

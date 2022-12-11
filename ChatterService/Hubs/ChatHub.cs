@@ -1,7 +1,7 @@
 ﻿using ChatterService.Entities;
 using ChatterService.Services;
 using Microsoft.AspNetCore.SignalR;
-using WeatherService.Providers;
+using WeatherClient.Providers;
 
 namespace ChatterService.Hubs
 {
@@ -60,7 +60,7 @@ namespace ChatterService.Hubs
             if (message.Equals("/weather now"))
             {
                 var weather = await weatherProvider.GetWeather();
-                await SaveAndBroadcastMessage(userConnection.RoomName, BotUserName, $"Current temperature is {weather.Temperature}.");
+                await SaveAndBroadcastMessage(userConnection.RoomName, BotUserName, $"Current temperature is {weather.Temperature} °C.");
             }
         }
 

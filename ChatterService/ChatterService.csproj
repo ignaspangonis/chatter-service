@@ -40,7 +40,7 @@
     <PackageReference Include="MongoDB.Driver.Core" Version="2.18.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WeatherService\WeatherService.csproj">
+    <ProjectReference Include="..\WeatherClient\WeatherClient.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

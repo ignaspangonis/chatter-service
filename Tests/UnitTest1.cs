@@ -1,7 +1,7 @@
 ﻿namespace Tests;
-using WeatherService;
-using WeatherService.Interfaces;
-using WeatherService.Providers;
+using WeatherClient;
+using WeatherClient.Interfaces;
+using WeatherClient.Providers;
 
 public class Tests
 {
@@ -10,8 +10,8 @@ public class Tests
     [OneTimeSetUp]
     public void Init()
     {
-        var data = new List<WeatherService.WeatherForecast> {
-            new WeatherService.WeatherForecast()
+        var data = new List<WeatherClient.WeatherForecast> {
+            new WeatherClient.WeatherForecast()
         };
 
         // init fake provider (mock provider)

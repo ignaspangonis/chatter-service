@@ -1,8 +1,9 @@
 ﻿using System;
 using AutoMapper;
-using WeatherService.Entities;
+using WeatherClient.Entities;
+using WeatherClient.Utils;
 
-namespace WeatherService.Transformers
+namespace WeatherClient.Transformers
 {
     public class WeatherTransformers
     {
@@ -14,6 +15,10 @@ namespace WeatherService.Transformers
                 cfg => {
                     cfg.CreateMap<CurrentWeatherResponse, WeatherDto>();
                     cfg.CreateMap<WeatherResponse, WeatherDto>()
+                        .ForMember(
+                        dest => dest.Summary,
+                        opt => opt.MapFrom(src => WeatherUtils.GetWeatherSummary(src.CurrentWeather.Temperature))
+        )
                         .IncludeMembers(src => src.CurrentWeather);
                 }
             );

@@ -1,11 +1,11 @@
 ﻿using System;
-using WeatherService.Entities;
-using WeatherService.Transformers;
+using WeatherClient.Entities;
+using WeatherClient.Transformers;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Text.Json;
 
-namespace WeatherService.Providers
+namespace WeatherClient.Providers
 {
 	public interface IWeatherProvider
 	{

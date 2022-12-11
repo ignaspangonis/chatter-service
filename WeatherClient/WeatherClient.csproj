@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <None Remove="Providers\" />
-    <None Remove="Repositories\" />
     <None Remove="Newtonsoft.Json" />
     <None Remove="RestSharp" />
     <None Remove="Transformers\" />
@@ -17,7 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Providers\" />
-    <Folder Include="Repositories\" />
     <Folder Include="Transformers\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
