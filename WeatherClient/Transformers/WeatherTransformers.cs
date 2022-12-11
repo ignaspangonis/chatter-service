@@ -16,9 +16,9 @@ namespace WeatherClient.Transformers
                     cfg.CreateMap<CurrentWeatherResponse, WeatherDto>();
                     cfg.CreateMap<WeatherResponse, WeatherDto>()
                         .ForMember(
-                        dest => dest.Summary,
-                        opt => opt.MapFrom(src => WeatherUtils.GetWeatherSummary(src.CurrentWeather.Temperature))
-        )
+                            dest => dest.Summary,
+                            opt => opt.MapFrom(src => WeatherUtils.GetWeatherSummary(src.CurrentWeather.Temperature))
+                        )
                         .IncludeMembers(src => src.CurrentWeather);
                 }
             );
