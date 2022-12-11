@@ -11,7 +11,6 @@
             if (14 < temperature && temperature <= 19) return "moderate";
             if (5 < temperature && temperature <= 14) return "cool";
             if (-2 < temperature && temperature <= 5) return "cold";
-            if (-2 < temperature && temperature <= 5) return "cold";
 
             return "very cold";
         }
