@@ -18,7 +18,7 @@ public class WeatherController : ControllerBase
     }
 
     [HttpGet(Name = "GetWeather")]
-    [ResponseCache(VaryByHeader = "User-Agent", Duration = 30)]
+    [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
     public WeatherDto Get()
     {
         _logger.Log(LogLevel.Information, "GET /weather called");
