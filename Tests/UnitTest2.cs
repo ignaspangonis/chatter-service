@@ -3,6 +3,8 @@ using WeatherClient.Providers;
 using Moq;
 using WeatherClient.Entities;
 using WeatherClient.Transformers;
+using NUnit.Framework;
+using Newtonsoft.Json;
 
 namespace Tests;
 
@@ -31,7 +33,9 @@ public class Tests2
         var weatherResponse = new WeatherResponse(new CurrentWeatherResponse(1.0, "2022-01-01T01:00"));
         var weatherTransformers = new WeatherTransformers();
 
-        Assert.That(weatherDto, Is.EqualTo(weatherTransformers.TransformWeather(weatherResponse)));
+        var transformedResult = weatherTransformers.TransformWeather(weatherResponse));
+
+        Assert.That(JsonConvert.SerializeObject(weatherDto), Is.EqualTo(JsonConvert.SerializeObject(transformedResult)));
     }
 }
 
