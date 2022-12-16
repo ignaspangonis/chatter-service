@@ -3,7 +3,6 @@ using WeatherClient.Entities;
 using WeatherClient.Transformers;
 using Newtonsoft.Json;
 using RestSharp;
-using System.Text.Json;
 
 namespace WeatherClient.Providers
 {
@@ -20,6 +19,12 @@ namespace WeatherClient.Providers
         public WeatherProvider()
 		{
 			m_client = new RestClient("https://api.open-meteo.com");
+            transformers = new WeatherTransformers();
+        }
+
+        public WeatherProvider(RestClient restClient)
+        {
+            m_client = restClient;
             transformers = new WeatherTransformers();
         }
 
