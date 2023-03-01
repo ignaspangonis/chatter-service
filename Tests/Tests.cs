@@ -42,9 +42,9 @@ public class Tests2
     {
         // Arrange
         string contentMock = "{\n    \"latitude\": 54.6875,\n    \"longitude\": 25.25,\n    \"generationtime_ms\": 0.2410411834716797,\n    \"utc_offset_seconds\": 0,\n    \"timezone\": \"GMT\",\n    \"timezone_abbreviation\": \"GMT\",\n    \"elevation\": 95.0,\n    \"current_weather\": {\n        \"temperature\": -7.2,\n        \"windspeed\": 8.0,\n        \"winddirection\": 234.0,\n        \"weathercode\": 3,\n        \"time\": \"2022-12-15T19:00\"\n    }\n}";
-        var httpClientMock = new Mock<RestClient>();
+        var restClientMock = new Mock<RestClient>();
 
-        httpClientMock
+        restClientMock
             .Setup(
                 m => m.ExecuteAsync(
                     It.IsAny<RestRequest>(),
@@ -52,7 +52,7 @@ public class Tests2
             )
             .ReturnsAsync(new RestResponse() { Content = contentMock });
 
-        var weatherProvider = new WeatherProvider(httpClientMock.Object);
+        var weatherProvider = new WeatherProvider(restClientMock.Object);
 
         var weatherDto = new WeatherDto(-7.2, "2022-12-15T19:00", "very cold");
 
@@ -61,9 +61,9 @@ public class Tests2
 
         // Assert
         var expectedValue = JsonConvert.SerializeObject(response);
-        var referenceValue = JsonConvert.SerializeObject(weatherDto);
+        var actualValue = JsonConvert.SerializeObject(weatherDto);
 
-        Assert.That(expectedValue, Is.EqualTo(referenceValue));
+        Assert.That(expectedValue, Is.EqualTo(actualValue));
 
         // TODO assert response code
     }
