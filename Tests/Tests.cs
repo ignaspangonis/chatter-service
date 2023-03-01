@@ -12,22 +12,6 @@ namespace Tests;
 
 public class Tests2
 {
-
-    [OneTimeSetUp]
-    public void Init()
-    {
-        //var data = new List<WeatherClient.WeatherForecast> {
-        //    new WeatherClient.WeatherForecast()
-        //};
-
-        //// init fake provider (mock provider)
-        //provider = new Mock<IWeatherProvider>(MockBehavior.Strict);
-        //// Loose - all good
-        //// Strict - kiekvienas iskvietimas turi buti sumockintas, kad butu predictable
-        //// turi zinoti ka tavo testas daro
-        //provider.Setup(m => m.GetSomeRepositoryShit(It.IsAny<String>, It.Is<String>)).Returns("");
-    }
-
     [Test]
     public void TransformWeather_TransformsCorrectly()
     {

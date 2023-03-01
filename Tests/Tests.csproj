@@ -28,9 +28,5 @@
   <ItemGroup>
     <None Remove="Moq" />
     <None Remove="Newtonsoft.Json" />
-    <None Remove="Mocks\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mocks\" />
   </ItemGroup>
 </Project>
