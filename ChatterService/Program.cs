@@ -17,10 +17,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins, option =>
     {
-        option.WithOrigins("http://localhost:3000")
+        option
+        .WithOrigins("http://localhost:19000,https://localhost:19000,http://192.168.0.101:19000")
         .AllowAnyHeader()
         .AllowAnyMethod()
-        .AllowCredentials();
+        .AllowCredentials()
+        .SetIsOriginAllowed((host) => true);
     });
 });
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
@@ -44,7 +46,7 @@ app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.MapGet("/", () => "Hello World!");
-app.MapHub<ChatHub>("/chat");
+app.MapHub<ChatHub>("/chat").AllowAnonymous();
 app.MapControllers();
 
 app.Run();
