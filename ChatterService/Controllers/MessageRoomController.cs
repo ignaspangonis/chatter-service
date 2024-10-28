@@ -32,6 +32,7 @@ namespace ChatterService.Controllers
                 logger.Log(LogLevel.Error, "Error", exception);
             }
 
+
             return Ok(new { message = "Room deleted" });
         }
     }
